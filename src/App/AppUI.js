@@ -3,30 +3,40 @@ import { TodoSearch } from "../components/TodoSearch";
 import { TodoList } from "../components/TodoList";
 import { TodoItem } from "../components/TodoItem";
 import { CreateTodoButton } from "../components/createTodoButton";
+import { TodosLoading } from "../components/TodosLoading";
+import { TodosError } from "../components/TodosError";
+import { EmptyTodos } from "../components/EmptyTodos";
+import { TodoContext } from "../hooks/TodoContext";
+import { useContext } from "react";
+import { Modal } from "../Modal";
+import { TodoForm } from "../components/TodoForm";
 
-function AppUI({
-  completedTodos,
-  totalTodos,
-  searchValue,
-  setSearchValue,
-  searchedTodos,
-  completeTodo,
-  deleteTodo,
-}) {
+function AppUI() {
+  const { loading, error, searchedTodos, completeTodo, deleteTodo, openModal } =
+    useContext(TodoContext);
   return (
     <>
       <div className="container">
         <div className="row">
           <div className="col-md-6">
-            <TodoSearch
-              searchValue={searchValue}
-              setSearchValue={setSearchValue}
-            />
+            <TodoSearch />
             <CreateTodoButton />
+            {openModal && (
+              <Modal>
+                <TodoForm />
+              </Modal>
+            )}
           </div>
           <div className="col-md-6">
-            <TodoCounter completed={completedTodos} total={totalTodos} />
+            <TodoCounter />
             <TodoList>
+              {loading && (
+                <>
+                  <TodosLoading /> <TodosLoading /> <TodosLoading />
+                </>
+              )}
+              {error && <TodosError />}
+              {!loading && searchedTodos.length === 0 && <EmptyTodos />}
               {searchedTodos.map((todo) => (
                 <TodoItem
                   key={todo.text}
